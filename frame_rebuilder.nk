@@ -1,0 +1,103 @@
+Group {
+ name rebuild_frames
+ selected true
+ xpos -1185
+ ypos 108
+ addUserKnob {20 User}
+ addUserKnob {26 text1 l "" +STARTLINE T "1) Hit 'Reset' before beginning"}
+ addUserKnob {22 reset l Reset T "n = nuke.thisNode()\['inputframe']\nkt = nuke.thisNode()\['kt']\nko = nuke.thisNode()\['ko']\np = nuke.thisNode()\['passthrough']\nn.clearAnimated()\nkt.clearAnimated()\nko.clearAnimated()\nn.setAnimated()\nf = nuke.thisNode().firstFrame()\nl = nuke.thisNode().lastFrame() \nn.animation(0).setKey(f,f)\nn.animation(0).setKey(l,l)\np.setValue(0)" +STARTLINE}
+ addUserKnob {26 ""}
+ addUserKnob {26 text2 l "" +STARTLINE T "2) Add keys on frames that are good\n    Remove keys on frames to be rebuilt "}
+ addUserKnob {3 inputframe l Frame}
+ inputframe 232
+ addUserKnob {22 addkey l "Add Key" -STARTLINE T "n = nuke.thisNode()\['inputframe']\nn.setAnimated()\nt = nuke.frame()\nn.animation(0).setKey(t,t)\n"}
+ addUserKnob {22 deletekey l "Delete key" -STARTLINE T "n = nuke.thisNode()\['inputframe']\nt = nuke.frame()\n#n.animation(0).removeKeyAt(t)\nn.removeKeyAt(t)"}
+ addUserKnob {22 addall l "Keyframe all" T "n = nuke.thisNode()\['inputframe']\nn.setAnimated()\nf = nuke.thisNode().firstFrame()\nl = nuke.thisNode().lastFrame() \n\nn.animation(0).setKey(f,f)\nn.animation(0).setKey(l,l)\n\nfor i in xrange( f, l, 1 ):\n\tn.setValueAt(i, i)" +STARTLINE}
+ addUserKnob {26 text3 l "" +STARTLINE T "(Do not change value of 'Frame' - leave it as frame number)"}
+ addUserKnob {26 ""}
+ addUserKnob {3 kt l INVISIBLE +INVISIBLE}
+ kt 375
+ addUserKnob {3 ko l INVISIBLE +INVISIBLE}
+ ko 129
+ addUserKnob {3 passthrough l INVISIBLE +INVISIBLE}
+ addUserKnob {26 text4 l "" +STARTLINE T "3) Hit 'Rebuild' to rebuild 'bad' frames"}
+ addUserKnob {22 rebuild l Rebuild! T "k = nuke.thisNode()\['inputframe']\n\nif(k.isAnimated()):\n\t\t\t\n\ttOriginalCurve = k.animation(0)\n\t\t\t\t\n\ttKeys = tOriginalCurve.keys()\n\n\ti = 0\n\n\t\n\tkt = nuke.thisNode()\['kt']\n\n\tko  = nuke.thisNode()\['ko']\n\n\tkt.clearAnimated()\n\n\tko.clearAnimated()\n\n\tkt.setAnimated()\n\n\tko.setAnimated()\n\n\tfor tKey in tKeys:\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\ttFrame = tKey.x \n\t\ttFrameY = tKey.y\n\n\t\tprint(\"key \" + str(i) + \" has x value \" + str(tFrame) + \", y value \" + str(tFrameY))\n\n\t\tko.setValueAt( i, tFrame )\n\n\t\tkt.setValueAt( tFrame, i )\n\n\t\ti = i+1\n\n\tkoKeys = ko.animation(0).keys()\n\n\tfor tKey in koKeys:\t\n\n\t\ttKey.interpolation = nuke.LINEAR\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\n\tktKeys = kt.animation(0).keys()\n\n\tfor tKey in ktKeys:\t\n\n\t\ttKey.interpolation = nuke.LINEAR\n\np = nuke.thisNode()\['passthrough']\np.setValue(1)" +STARTLINE}
+ addUserKnob {20 about l About}
+ addUserKnob {26 credit l "" -STARTLINE T "Rebuilds broken or missing frames using an OFlow. \nAssumes that many of the frames are OK, but that bad frames are littered throughout. \n\nv1.0 by Richard Frazer"}
+ addUserKnob {26 ""}
+}
+ Input {
+  inputs 0
+  name Input1
+  xpos 475
+  ypos -625
+ }
+ Dot {
+  name Dot3
+  xpos 509
+  ypos -547
+ }
+set N56b81e70 [stack 0]
+ TimeWarp {
+  lookup {{parent.kt i}}
+  name TimeWarp5
+  selected true
+  xpos 475
+  ypos -480
+ }
+ OFXuk.co.thefoundry.time.oflow_v100 {
+  method Motion
+  timing "Source Frame"
+  timingFrame {{parent.ko L x1001 1001 x1004 1004 x1005 1005 x1008 1008 x1012 1012 1016 x1150 1150}}
+  timingSpeed 0.5
+  filtering Normal
+  warpMode Normal
+  correctLuminance false
+  automaticShutterTime false
+  shutterTime 0
+  shutterSamples 1
+  vectorDetail 0.2
+  smoothness 0.5
+  blockSize 6
+  Tolerances 0
+  weightRed 0.3
+  weightGreen 0.6
+  weightBlue 0.1
+  showVectors false
+  cacheBreaker false
+  name OFlow2
+  xpos 475
+  ypos -397
+ }
+push $N56b81e70
+ Dot {
+  name Dot2
+  xpos 596
+  ypos -492
+ }
+ Dot {
+  name Dot1
+  xpos 596
+  ypos -325
+ }
+ Switch {
+  inputs 2
+  which {{parent.passthrough}}
+  name Switch1
+  xpos 475
+  ypos -287
+ }
+ Output {
+  name Output1
+  xpos 475
+  ypos -215
+ }
+ Viewer {
+  frame 1026
+  input_process false
+  name Viewer1
+  xpos 950
+  ypos -10
+  hide_input true
+ }
+end_group
