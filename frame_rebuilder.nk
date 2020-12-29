@@ -1,9 +1,10 @@
 Group {
  name rebuild_frames
  selected true
- xpos -1185
- ypos 108
+ xpos -371
+ ypos -56
  addUserKnob {20 User}
+ addUserKnob {68 method l "Optical Flow Method" t "Oflow is faster but Kronos gives a better result usually." M {OFlow Kronos}}
  addUserKnob {26 text1 l "" +STARTLINE T "1) Hit 'Reset' before beginning"}
  addUserKnob {22 reset l Reset T "n = nuke.thisNode()\['inputframe']\nkt = nuke.thisNode()\['kt']\nko = nuke.thisNode()\['ko']\np = nuke.thisNode()\['passthrough']\nn.clearAnimated()\nkt.clearAnimated()\nko.clearAnimated()\nn.setAnimated()\nf = nuke.thisNode().firstFrame()\nl = nuke.thisNode().lastFrame() \nn.animation(0).setKey(f,f)\nn.animation(0).setKey(l,l)\np.setValue(0)" +STARTLINE}
  addUserKnob {26 ""}
@@ -23,7 +24,7 @@ Group {
  addUserKnob {26 text4 l "" +STARTLINE T "3) Hit 'Rebuild' to rebuild 'bad' frames"}
  addUserKnob {22 rebuild l Rebuild! T "k = nuke.thisNode()\['inputframe']\n\nif(k.isAnimated()):\n\t\t\t\n\ttOriginalCurve = k.animation(0)\n\t\t\t\t\n\ttKeys = tOriginalCurve.keys()\n\n\ti = 0\n\n\t\n\tkt = nuke.thisNode()\['kt']\n\n\tko  = nuke.thisNode()\['ko']\n\n\tkt.clearAnimated()\n\n\tko.clearAnimated()\n\n\tkt.setAnimated()\n\n\tko.setAnimated()\n\n\tfor tKey in tKeys:\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\ttFrame = tKey.x \n\t\ttFrameY = tKey.y\n\n\t\tprint(\"key \" + str(i) + \" has x value \" + str(tFrame) + \", y value \" + str(tFrameY))\n\n\t\tko.setValueAt( i, tFrame )\n\n\t\tkt.setValueAt( tFrame, i )\n\n\t\ti = i+1\n\n\tkoKeys = ko.animation(0).keys()\n\n\tfor tKey in koKeys:\t\n\n\t\ttKey.interpolation = nuke.LINEAR\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\n\tktKeys = kt.animation(0).keys()\n\n\tfor tKey in ktKeys:\t\n\n\t\ttKey.interpolation = nuke.LINEAR\n\np = nuke.thisNode()\['passthrough']\np.setValue(1)" +STARTLINE}
  addUserKnob {20 about l About}
- addUserKnob {26 credit l "" -STARTLINE T "Rebuilds broken or missing frames using an OFlow. \nAssumes that many of the frames are OK, but that bad frames are littered throughout. \n\nv1.0 by Richard Frazer"}
+ addUserKnob {26 credit l "" -STARTLINE T "Rebuilds broken or missing frames using an OFlow or a Kronos\nAssumes that many of the frames are OK, but that bad frames are littered throughout. \n\nv1.0 by Richard Frazer\nv1.1 by Richard Frazer with edit by Daniel Mark Miller"}
  addUserKnob {26 ""}
 }
  Input {
@@ -37,14 +38,27 @@ Group {
   xpos 509
   ypos -547
  }
-set N56b81e70 [stack 0]
+set Naaa48800 [stack 0]
  TimeWarp {
   lookup {{parent.kt i}}
+  time ""
   name TimeWarp5
-  selected true
   xpos 475
   ypos -480
  }
+set Naaa48400 [stack 0]
+ Kronos {
+  retimedChannels all
+  timing2 Frame
+  timingFrame2 {{parent.ko}}
+  showLegacyMode false
+  motionEstimation Regularized
+  legacyModeNuke9 false
+  name Kronos1
+  xpos 338
+  ypos -426
+ }
+push $Naaa48400
  OFXuk.co.thefoundry.time.oflow_v100 {
   method Motion
   timing "Source Frame"
@@ -67,9 +81,16 @@ set N56b81e70 [stack 0]
   cacheBreaker false
   name OFlow2
   xpos 475
-  ypos -397
+  ypos -398
  }
-push $N56b81e70
+ Switch {
+  inputs 2
+  which {{parent.method}}
+  name Switch2
+  xpos 475
+  ypos -355
+ }
+push $Naaa48800
  Dot {
   name Dot2
   xpos 596
