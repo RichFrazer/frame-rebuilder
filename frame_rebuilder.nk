@@ -1,30 +1,37 @@
 Group {
  name rebuild_frames
  selected true
- xpos -1185
- ypos 108
+ xpos -421
+ ypos 15
  addUserKnob {20 User}
  addUserKnob {26 text1 l "" +STARTLINE T "1) Hit 'Reset' before beginning"}
- addUserKnob {22 reset l Reset T "n = nuke.thisNode()\['inputframe']\nkt = nuke.thisNode()\['kt']\nko = nuke.thisNode()\['ko']\np = nuke.thisNode()\['passthrough']\nn.clearAnimated()\nkt.clearAnimated()\nko.clearAnimated()\nn.setAnimated()\nf = nuke.thisNode().firstFrame()\nl = nuke.thisNode().lastFrame() \nn.animation(0).setKey(f,f)\nn.animation(0).setKey(l,l)\np.setValue(0)" +STARTLINE}
+ addUserKnob {22 reset l Reset T "n = nuke.thisNode()\['inputframe']\nkt = nuke.thisNode()\['kt']\nko = nuke.thisNode()\['ko']\np = nuke.thisNode()\['passthrough']\nkf = nuke.thisNode()\['kf']\nkl = nuke.thisNode()\['kl']\nn.clearAnimated()\nkt.clearAnimated()\nko.clearAnimated()\nn.setAnimated()\nf = nuke.thisNode().firstFrame()\nl = nuke.thisNode().lastFrame() \nn.animation(0).setKey(f,f)\nn.animation(0).setKey(l,l)\np.setValue(0)\nkf.setValue(f)\nkl.setValue(l)\n\ndef rebuild():\n\n\tk = nuke.thisNode()\['inputframe']\n\n\tif(k.isAnimated()):\n\t\t\t\t\n\t\ttOriginalCurve = k.animation(0)\n\t\t\t\t\t\n\t\ttKeys = tOriginalCurve.keys()\n\n\t\ti = 0\n\n\t\t\n\t\tkt = nuke.thisNode()\['kt']\n\t\tko  = nuke.thisNode()\['ko']\n\t\tkv = nuke.thisNode()\['verbose'].value()\n\t\tkt.clearAnimated()\n\t\tko.clearAnimated()\n\t\tkt.setAnimated()\n\t\tko.setAnimated()\n\n\t\tfor tKey in tKeys:\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\ttFrame = tKey.x \n\t\t\ttFrameY = tKey.y\n\n\t\t\tif (kv):\n\n\t\t\t\tprint(\"key \" + str(i) + \" has x value \" + str(tFrame) + \", y value \" + str(tFrameY))\n\n\t\t\tko.setValueAt( i, tFrame )\n\n\t\t\tkt.setValueAt( tFrame, i )\n\n\t\t\ti = i+1\n\n\t\tkoKeys = ko.animation(0).keys()\n\n\t\tfor tKey in koKeys:\t\n\n\t\t\ttKey.interpolation = nuke.LINEAR\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\n\t\tktKeys = kt.animation(0).keys()\n\n\t\tfor tKey in ktKeys:\t\n\n\t\t\ttKey.interpolation = nuke.LINEAR\n\n\tp = nuke.thisNode()\['passthrough']\n\tp.setValue(1)" +STARTLINE}
  addUserKnob {26 ""}
  addUserKnob {26 text2 l "" +STARTLINE T "2) Add keys on frames that are good\n    Remove keys on frames to be rebuilt "}
- addUserKnob {3 inputframe l Frame}
- inputframe 232
- addUserKnob {22 addkey l "Add Key" -STARTLINE T "n = nuke.thisNode()\['inputframe']\nn.setAnimated()\nt = nuke.frame()\nn.animation(0).setKey(t,t)\n"}
- addUserKnob {22 deletekey l "Delete key" -STARTLINE T "n = nuke.thisNode()\['inputframe']\nt = nuke.frame()\n#n.animation(0).removeKeyAt(t)\nn.removeKeyAt(t)"}
  addUserKnob {22 addall l "Keyframe all" T "n = nuke.thisNode()\['inputframe']\nn.setAnimated()\nf = nuke.thisNode().firstFrame()\nl = nuke.thisNode().lastFrame() \n\nn.animation(0).setKey(f,f)\nn.animation(0).setKey(l,l)\n\nfor i in range( f, l, 1 ):\n\tn.setValueAt(i, i)" +STARTLINE}
- addUserKnob {26 text3 l "" +STARTLINE T "(Do not change value of 'Frame' - leave it as frame number)"}
+ addUserKnob {3 inputframe l Frame}
+ inputframe {{curve x1001 1001 x1100 1100}}
+ addUserKnob {22 addkey l "Add Key" -STARTLINE T "n = nuke.thisNode()\['inputframe']\nn.setAnimated()\nt = nuke.frame()\nn.animation(0).setKey(t,t)\n"}
+ addUserKnob {22 deletekey l "Delete key" -STARTLINE T "n = nuke.thisNode()\['inputframe']\nt = nuke.frame()\n#n.animation(0).removeKeyAt(t)\nn.removeKeyAt(t)\nrebuild()"}
+ addUserKnob {26 text3 l "" +STARTLINE T "(Do not manually change value of 'Frame' - leave it as frame number)"}
  addUserKnob {26 ""}
- addUserKnob {3 kt l INVISIBLE +INVISIBLE}
- kt 375
- addUserKnob {3 ko l INVISIBLE +INVISIBLE}
- ko 129
- addUserKnob {3 passthrough l INVISIBLE +INVISIBLE}
+ addUserKnob {4 method l "Optical Flow Method" t "Oflow is faster but Kronos gives a better result usually." M {OFlow Kronos}}
+ addUserKnob {26 ""}
  addUserKnob {26 text4 l "" +STARTLINE T "3) Hit 'Rebuild' to rebuild 'bad' frames"}
- addUserKnob {22 rebuild l Rebuild! T "k = nuke.thisNode()\['inputframe']\n\nif(k.isAnimated()):\n\t\t\t\n\ttOriginalCurve = k.animation(0)\n\t\t\t\t\n\ttKeys = tOriginalCurve.keys()\n\n\ti = 0\n\n\t\n\tkt = nuke.thisNode()\['kt']\n\n\tko  = nuke.thisNode()\['ko']\n\n\tkt.clearAnimated()\n\n\tko.clearAnimated()\n\n\tkt.setAnimated()\n\n\tko.setAnimated()\n\n\tfor tKey in tKeys:\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\ttFrame = tKey.x \n\t\ttFrameY = tKey.y\n\n\t\tprint(\"key \" + str(i) + \" has x value \" + str(tFrame) + \", y value \" + str(tFrameY))\n\n\t\tko.setValueAt( i, tFrame )\n\n\t\tkt.setValueAt( tFrame, i )\n\n\t\ti = i+1\n\n\tkoKeys = ko.animation(0).keys()\n\n\tfor tKey in koKeys:\t\n\n\t\ttKey.interpolation = nuke.LINEAR\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\n\tktKeys = kt.animation(0).keys()\n\n\tfor tKey in ktKeys:\t\n\n\t\ttKey.interpolation = nuke.LINEAR\n\np = nuke.thisNode()\['passthrough']\np.setValue(1)" +STARTLINE}
+ addUserKnob {22 rebuild l Rebuild! T rebuild() +STARTLINE}
+ addUserKnob {6 verbose +STARTLINE}
  addUserKnob {20 about l About}
- addUserKnob {26 credit l "" -STARTLINE T "Rebuilds broken or missing frames using an OFlow. \nAssumes that many of the frames are OK, but that bad frames are littered throughout. \n\nv1.1 by Richard Frazer"}
+ addUserKnob {26 credit l "" -STARTLINE T "FRAME REBUILDER v1.2\n\nRebuilds broken or missing frames using Optical Flow.\nAssumes that many of the frames are OK, but that bad frames are littered throughout. \n\nhttps://richardfrazer.com/tools-tutorials/rebuilding-bad-frames-using-oflow/\n\nv1.1 by Richard Frazer\nv1.2 by Richard Frazer with update by Daniel Mark Miller \n         (option between OFlow and Kronos methods)\n"}
  addUserKnob {26 ""}
+ addUserKnob {3 kt +INVISIBLE}
+ kt 1328
+ addUserKnob {3 ko +INVISIBLE}
+ ko 0.01529052036
+ addUserKnob {3 passthrough +INVISIBLE}
+ addUserKnob {3 kf +INVISIBLE}
+ kf 1001
+ addUserKnob {3 kl +INVISIBLE}
+ kl 1100
 }
  Input {
   inputs 0
@@ -37,14 +44,28 @@ Group {
   xpos 509
   ypos -547
  }
-set N56b81e70 [stack 0]
+set Nfcd8da0 [stack 0]
  TimeWarp {
-  lookup {{parent.kt i}}
+  lookup {{parent.kt}}
+  time ""
   name TimeWarp5
-  selected true
   xpos 475
   ypos -480
  }
+set Nfcddd50 [stack 0]
+ Kronos {
+  input.first {{parent.kf}}
+  input.last {{parent.kl}}
+  retimedChannels all
+  timing2 Frame
+  timingFrame2 {{parent.ko}}
+  motionEstimation Regularized
+  name Kronos2
+  selected true
+  xpos 475
+  ypos -398
+ }
+push $Nfcddd50
  OFXuk.co.thefoundry.time.oflow_v100 {
   method Motion
   timing "Source Frame"
@@ -66,10 +87,17 @@ set N56b81e70 [stack 0]
   showVectors false
   cacheBreaker false
   name OFlow2
-  xpos 475
-  ypos -397
+  xpos 344
+  ypos -403
  }
-push $N56b81e70
+ Switch {
+  inputs 2
+  which {{parent.method i}}
+  name Switch2
+  xpos 475
+  ypos -341
+ }
+push $Nfcd8da0
  Dot {
   name Dot2
   xpos 596
@@ -78,26 +106,18 @@ push $N56b81e70
  Dot {
   name Dot1
   xpos 596
-  ypos -325
+  ypos -302
  }
  Switch {
   inputs 2
   which {{parent.passthrough}}
   name Switch1
   xpos 475
-  ypos -287
+  ypos -276
  }
  Output {
   name Output1
   xpos 475
   ypos -215
- }
- Viewer {
-  frame 1026
-  input_process false
-  name Viewer1
-  xpos 950
-  ypos -10
-  hide_input true
  }
 end_group
