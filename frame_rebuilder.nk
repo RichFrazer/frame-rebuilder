@@ -2,7 +2,7 @@ Group {
  name rebuild_frames
  selected true
  xpos -421
- ypos 15
+ ypos 16
  addUserKnob {20 User}
  addUserKnob {26 text1 l "" +STARTLINE T "1) Hit 'Reset' before beginning"}
  addUserKnob {22 reset l Reset T "n = nuke.thisNode()\['inputframe']\nkt = nuke.thisNode()\['kt']\nko = nuke.thisNode()\['ko']\np = nuke.thisNode()\['passthrough']\nkf = nuke.thisNode()\['kf']\nkl = nuke.thisNode()\['kl']\nn.clearAnimated()\nkt.clearAnimated()\nko.clearAnimated()\nn.setAnimated()\nf = nuke.thisNode().firstFrame()\nl = nuke.thisNode().lastFrame() \nn.animation(0).setKey(f,f)\nn.animation(0).setKey(l,l)\np.setValue(0)\nkf.setValue(f)\nkl.setValue(l)\n\ndef rebuild():\n\n\tk = nuke.thisNode()\['inputframe']\n\n\tif(k.isAnimated()):\n\t\t\t\t\n\t\ttOriginalCurve = k.animation(0)\n\t\t\t\t\t\n\t\ttKeys = tOriginalCurve.keys()\n\n\t\ti = 0\n\n\t\t\n\t\tkt = nuke.thisNode()\['kt']\n\t\tko  = nuke.thisNode()\['ko']\n\t\tkv = nuke.thisNode()\['verbose'].value()\n\t\tkt.clearAnimated()\n\t\tko.clearAnimated()\n\t\tkt.setAnimated()\n\t\tko.setAnimated()\n\n\t\tfor tKey in tKeys:\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\ttFrame = tKey.x \n\t\t\ttFrameY = tKey.y\n\n\t\t\tif (kv):\n\n\t\t\t\tprint(\"key \" + str(i) + \" has x value \" + str(tFrame) + \", y value \" + str(tFrameY))\n\n\t\t\tko.setValueAt( i, tFrame )\n\n\t\t\tkt.setValueAt( tFrame, i )\n\n\t\t\ti = i+1\n\n\t\tkoKeys = ko.animation(0).keys()\n\n\t\tfor tKey in koKeys:\t\n\n\t\t\ttKey.interpolation = nuke.LINEAR\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\n\t\tktKeys = kt.animation(0).keys()\n\n\t\tfor tKey in ktKeys:\t\n\n\t\t\ttKey.interpolation = nuke.LINEAR\n\n\tp = nuke.thisNode()\['passthrough']\n\tp.setValue(1)" +STARTLINE}
@@ -21,7 +21,7 @@ Group {
  addUserKnob {22 rebuild l Rebuild! T rebuild() +STARTLINE}
  addUserKnob {6 verbose +STARTLINE}
  addUserKnob {20 about l About}
- addUserKnob {26 credit l "" -STARTLINE T "FRAME REBUILDER v1.2\n\nRebuilds broken or missing frames using Optical Flow.\nAssumes that many of the frames are OK, but that bad frames are littered throughout. \n\nhttps://richardfrazer.com/tools-tutorials/rebuilding-bad-frames-using-oflow/\n\nv1.1 by Richard Frazer\nv1.2 by Richard Frazer with update by Daniel Mark Miller \n         (option between OFlow and Kronos methods)\n"}
+ addUserKnob {26 credit l "" -STARTLINE T "FRAME REBUILDER v1.2\n\nRebuilds broken or missing frames using Optical Flow.\nAssumes that many of the frames are good, but that bad frames are littered throughout. \n\nhttps://richardfrazer.com/tools-tutorials/rebuilding-bad-frames-using-oflow/\n\nv1.1 by Richard Frazer\nv1.2 by Richard Frazer with update by Daniel Mark Miller \n         (option between OFlow and Kronos methods)\nv1.3 by Richard Frazer - using OFlow2 class\n"}
  addUserKnob {26 ""}
  addUserKnob {3 kt +INVISIBLE}
  kt 1328
@@ -61,34 +61,19 @@ set Nfcddd50 [stack 0]
   timingFrame2 {{parent.ko}}
   motionEstimation Regularized
   name Kronos2
-  selected true
-  xpos 475
-  ypos -398
+  xpos 557
+  ypos -406
  }
 push $Nfcddd50
- OFXuk.co.thefoundry.time.oflow_v100 {
-  method Motion
-  timing "Source Frame"
-  timingFrame {{parent.ko L x1001 1001 x1004 1004 x1005 1005 x1008 1008 x1012 1012 1016 x1150 1150}}
-  timingSpeed 0.5
-  filtering Normal
-  warpMode Normal
-  correctLuminance false
-  automaticShutterTime false
-  shutterTime 0
-  shutterSamples 1
-  vectorDetail 0.2
-  smoothness 0.5
-  blockSize 6
-  Tolerances 0
-  weightRed 0.3
-  weightGreen 0.6
-  weightBlue 0.1
-  showVectors false
-  cacheBreaker false
-  name OFlow2
-  xpos 344
-  ypos -403
+ OFlow2 {
+  input.first {{parent.kf}}
+  input.last {{parent.kl}}
+  timing2 Frame
+  timingFrame2 {{parent.ko}}
+  name OFlow3
+  selected true
+  xpos 413
+  ypos -401
  }
  Switch {
   inputs 2
@@ -100,13 +85,13 @@ push $Nfcddd50
 push $Nfcd8da0
  Dot {
   name Dot2
-  xpos 596
-  ypos -492
+  xpos 685
+  ypos -490
  }
  Dot {
   name Dot1
-  xpos 596
-  ypos -302
+  xpos 685
+  ypos -300
  }
  Switch {
   inputs 2
